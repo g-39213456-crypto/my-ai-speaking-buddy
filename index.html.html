@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY CLASSMATES, MY AI SPEAKING BUDDIES! - Interactive Primary English</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            yellow: '#FFD166',
+                            green: '#06D6A0',
+                            blue: '#118AB2',
+                            darkblue: '#073B4C',
+                            pink: '#EF476F',
+                            orange: '#F78C6B',
+                            purple: '#8338EC'
+                        }
+                    },
+                    animation: {
+                        'bounce-subtle': 'bounceSubtle 2s infinite',
+                        'pulse-glow': 'pulseGlow 1.5s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'speaking-lip': 'speakingLip 0.4s ease-in-out infinite alternate',
+                        'recording-pulse': 'recordingPulse 1s infinite alternate'
+                    },
+                    keyframes: {
+                        bounceSubtle: {
+                            '0%, 100%': { transform: 'translateY(-2%)' },
+                            '50%': { transform: 'translateY(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(6, 214, 160, 0.6)' },
+                            '50%': { boxShadow: '0 0 30px rgba(6, 214, 160, 1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        speakingLip: {
+                            '0%': { transform: 'scaleY(1)' },
+                            '100%': { transform: 'scaleY(1.15) scaleX(1.05)' }
+                        },
+                        recordingPulse: {
+                            '0%': { transform: 'scale(1)', boxShaow: '0 0 0 0 rgba(239, 71, 111, 0.7)' },
+                            '100%': { transform: 'scale(1.05)', boxShadow: '0 0 25px 10px rgba(239, 71, 111, 0.4)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #073B4C 0%, #118AB2 50%, #06D6A0 100%);
+            min-height: 100vh;
+            color: #073B4C;
+            user-select: none;
+        }
+
+        /* Speech Bubble Tail */
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -18px;
+            top: 35px;
+            border-width: 10px 18px 10px 0;
+            border-style: solid;
+            border-color: transparent #ffffff transparent transparent;
+            display: block;
+            width: 0;
+        }
+        @media (max-width: 1024px) {
+            .speech-bubble::before {
+                left: 30px;
+                top: -18px;
+                border-width: 0 10px 18px 10px;
+                border-color: transparent transparent #ffffff transparent;
+            }
+        }
+
+        /* Sound Wave Bar Animation */
+        .wave-bar {
+            width: 4px;
+            height: 16px;
+            background-color: #06D6A0;
+            border-radius: 2px;
+            animation: wave 0.8s ease-in-out infinite;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes wave {
+            0%, 100% { height: 8px; }
+            50% { height: 28px; }
+        }
+
+        /* Audio Visualizer Waves for Recording */
+        .rec-wave-bar {
+            width: 6px;
+            height: 12px;
+            background-color: #EF476F;
+            border-radius: 3px;
+            animation: recWave 0.6s ease-in-out infinite alternate;
+        }
+        .rec-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .rec-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .rec-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .rec-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes recWave {
+            0% { height: 6px; }
+            100% { height: 32px; }
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #118AB2;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 flex flex-col justify-between min-h-screen overflow-x-hidden">
+
+    <!-- TOP NAVIGATION & HEADER BANNER -->
+    <header class="w-full max-w-7xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-xl mb-3 border-2 border-brand-yellow flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- App Title & Reference -->
+        <div class="flex items-center gap-3">
+            <div class="bg-brand-yellow text-brand-darkblue p-2 sm:p-3 rounded-xl font-fredoka font-bold text-xl sm:text-2xl shadow-inner flex items-center justify-center">
+                <i class="fa-solid fa-people-group text-2xl sm:text-3xl text-brand-pink"></i>
+            </div>
+            <div>
+                <h1 class="font-fredoka text-xl sm:text-2xl lg:text-3xl font-extrabold text-brand-darkblue tracking-wide leading-none">
+                    MY CLASSMATES, MY AI SPEAKING BUDDIES!
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-600 font-semibold mt-1">
+                    <span class="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md"><i class="fa-solid fa-book-open mr-1"></i>Textbook Page 86</span>
+                    <span class="hidden sm:inline-block ml-2 text-gray-500">• Topic: Animals & Adjectives</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Progress Counter & Star Badge -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+            
+            <!-- Question Round Tracker -->
+            <div class="bg-brand-darkblue/5 border border-brand-darkblue/10 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-brand-blue text-lg"></i>
+                <span class="font-fredoka text-sm sm:text-base font-bold text-brand-darkblue">
+                    Round <span id="currentRoundText" class="text-brand-pink text-lg font-extrabold">1</span> / 10
+                </span>
+            </div>
+
+            <!-- Star Rewards Counter -->
+            <div class="bg-brand-yellow/30 border border-brand-yellow px-3 py-1.5 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-star text-yellow-500 text-xl animate-bounce-subtle"></i>
+                <span id="starCounter" class="font-fredoka text-lg font-extrabold text-brand-darkblue">0</span>
+                <span class="text-xs font-bold text-gray-600 uppercase">Stars</span>
+            </div>
+
+            <!-- Vocabulary Bank Button -->
+            <button onclick="openVocabModal()" class="bg-brand-purple hover:bg-purple-700 text-white font-fredoka font-bold px-3 py-2 rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark text-brand-yellow"></i>
+                <span class="hidden sm:inline">Vocab Bank</span>
+            </button>
+
+            <!-- Privacy Policy Button -->
+            <button onclick="openPrivacyModal()" class="bg-gray-100 hover:bg-gray-200 text-brand-darkblue p-2 rounded-xl text-sm transition-all" title="Audio Privacy Info">
+                <i class="fa-solid fa-shield-halved text-brand-blue"></i>
+            </button>
+
+            <!-- Audio Settings Controls -->
+            <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+                <button id="toggleMuteBtn" onclick="toggleMute()" class="p-2 rounded-lg text-gray-700 hover:bg-gray-200 transition-all" title="Toggle Sound">
+                    <i id="muteIcon" class="fa-solid fa-volume-high text-lg text-brand-blue"></i>
+                </button>
+                <select id="voiceSpeedSelect" onchange="changeVoiceSpeed(this.value)" class="bg-white text-xs font-bold border border-gray-300 rounded-lg p-1.5 text-brand-darkblue cursor-pointer outline-none">
+                    <option value="0.8">0.8x</option>
+                    <option value="1.0" selected>1.0x</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE DISPLAY AREA (16:9 Widescreen Classroom Grid) -->
+    <main class="w-full max-w-7xl mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 mb-3">
+
+        <!-- LEFT COLUMN: CLASSMATE SPEAKING BUDDY & QUESTION BUBBLE (5 Columns) -->
+        <section class="lg:col-span-5 bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-2xl border-4 border-white/80 flex flex-col justify-between relative overflow-hidden">
+            
+            <!-- Buddy Identity Header -->
+            <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                <div class="bg-brand-green/20 text-brand-darkblue text-xs font-extrabold px-3 py-1 rounded-full border border-brand-green/40 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping"></span>
+                    <span id="buddyIdentityLabel">SPEAKING BUDDY #1</span>
+                </div>
+                <span id="pupilNameDisplay" class="font-fredoka text-sm font-bold text-brand-purple">
+                    Classmate: Adam
+                </span>
+            </div>
+
+            <!-- Classmate Photo Container -->
+            <div class="mt-4 flex flex-col items-center">
+                
+                <!-- Photo Outer Frame with Glow -->
+                <div id="buddyFrame" class="relative group w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 border-brand-yellow shadow-xl overflow-hidden bg-gradient-to-b from-blue-100 to-indigo-50 flex items-center justify-center transition-all duration-300">
+                    
+                    <!-- Pupil Photograph Image -->
+                    <img id="pupilPhoto" src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600" alt="Classmate Pupil Partner" class="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105">
+
+                    <!-- Lipsync Animated Mouth Overlay -->
+                    <div id="speakingLipsOverlay" class="hidden absolute bottom-6 w-10 h-4 bg-red-400/80 rounded-full border-2 border-white animate-speaking-lip"></div>
+
+                    <!-- Voice Indicator Overlay Badge -->
+                    <div id="speakingBadge" class="hidden absolute top-2 right-2 bg-brand-pink text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1">
+                        <i class="fa-solid fa-volume-high animate-pulse"></i> Speaking...
+                    </div>
+                </div>
+
+                <!-- Teacher Controls for Pupil Photo & Name -->
+                <div class="mt-3 flex items-center gap-2 flex-wrap justify-center">
+                    <label for="photoUploadInput" class="cursor-pointer bg-brand-blue/10 hover:bg-brand-blue/20 text-brand-blue text-xs font-bold px-3 py-1.5 rounded-xl transition-all border border-brand-blue/30 flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-camera text-brand-blue"></i>
+                        <span>Upload Pupil Photo</span>
+                    </label>
+                    <input type="file" id="photoUploadInput" accept="image/*" class="hidden" onchange="handlePupilPhotoUpload(event)">
+                    
+                    <button onclick="promptEditPupilName()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-2.5 py-1.5 rounded-xl transition-all border border-gray-300" title="Edit Pupil Name">
+                        <i class="fa-solid fa-pen"></i> Name
+                    </button>
+
+                    <button onclick="resetCurrentPupilPhoto()" class="text-xs text-gray-500 hover:text-red-500 p-1" title="Reset Default Photo">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SPEECH BUBBLE CONTAINER -->
+            <div class="mt-4 flex-1 flex flex-col justify-center">
+                <div id="speechBubble" class="speech-bubble p-4 sm:p-5 border-2 border-brand-blue/20 transition-all duration-300">
+                    
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <span id="buddySpeakerLabel" class="text-xs font-bold uppercase tracking-wider text-brand-blue flex items-center gap-1">
+                            <i class="fa-solid fa-comment-dots"></i> Classmate Asks:
+                        </span>
+
+                        <!-- Play Question Audio Button -->
+                        <button id="btnPlayQuestion" onclick="playCurrentQuestionAudio()" class="bg-brand-yellow/30 hover:bg-brand-yellow text-brand-darkblue text-xs font-bold px-2.5 py-1 rounded-lg transition-all flex items-center gap-1" title="Play Question Audio">
+                            <i class="fa-solid fa-play"></i>
+                            <span>PLAY QUESTION</span>
+                        </button>
+                    </div>
+
+                    <!-- Question Prompt Text -->
+                    <p id="questionText" class="font-fredoka text-xl sm:text-2xl text-brand-darkblue font-extrabold leading-tight">
+                        "Why do you like kittens?"
+                    </p>
+
+                    <!-- Speech Visualizer -->
+                    <div id="audioWaveVisualizer" class="hidden mt-3 flex items-center gap-1">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <span class="text-xs text-brand-blue font-bold ml-2">Speaking Question...</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: ANIMAL TARGET & RECORDING/EVALUATION WORKFLOW (7 Columns) -->
+        <section class="lg:col-span-7 bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-2xl border-4 border-white/80 flex flex-col justify-between">
+            
+            <!-- STEPPER PROGRESS WORKFLOW BAR -->
+            <div class="w-full bg-gray-100 rounded-2xl p-2 mb-3 border border-gray-200">
+                <div class="grid grid-cols-4 gap-1 text-center font-fredoka text-[11px] sm:text-xs font-bold">
+                    <div id="stepTab1" class="py-1.5 px-1 rounded-xl transition-all bg-brand-blue text-white shadow-md">
+                        1. ASK <i class="fa-solid fa-volume-high ml-1"></i>
+                    </div>
+                    <div id="stepTab2" class="py-1.5 px-1 rounded-xl transition-all text-gray-500">
+                        2. RECORD <i class="fa-solid fa-microphone ml-1"></i>
+                    </div>
+                    <div id="stepTab3" class="py-1.5 px-1 rounded-xl transition-all text-gray-500">
+                        3. REPLAY & EVAL <i class="fa-solid fa-play ml-1"></i>
+                    </div>
+                    <div id="stepTab4" class="py-1.5 px-1 rounded-xl transition-all text-gray-500">
+                        4. MODEL & NEXT <i class="fa-solid fa-circle-arrow-right ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARGET ANIMAL DISPLAY CARD -->
+            <div class="relative bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-brand-green/30 rounded-2xl p-3 sm:p-4 mb-3 flex items-center gap-3 shadow-sm">
+                
+                <!-- Animal Image Container -->
+                <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-4 border-white shadow-lg flex-shrink-0 bg-white">
+                    <img id="animalImg" src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&q=80&w=400" alt="Kittens" class="w-full h-full object-cover">
+                    <span id="animalEmoji" class="absolute top-1 left-1 bg-white/90 backdrop-blur-sm p-1 rounded-lg text-base shadow-sm">🐱</span>
+                </div>
+
+                <!-- Animal Details & Adjective Helper -->
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="bg-brand-green/20 text-brand-darkblue text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Target Animal</span>
+                        <span id="animalNameTag" class="text-xs font-bold text-gray-500">Round 1 Target</span>
+                    </div>
+                    <h2 id="animalTitle" class="font-fredoka text-xl sm:text-2xl font-extrabold text-brand-darkblue leading-none mb-1">
+                        Kittens
+                    </h2>
+                    <p class="text-xs text-gray-600 font-medium mb-1">
+                        Textbook Adjective Suggestions:
+                    </p>
+                    <div id="suggestedAdjectivesBadges" class="flex flex-wrap gap-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN DYNAMIC INTERACTION AREA (Changes by Workflow Step) -->
+            <div class="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-3 sm:p-4 flex flex-col justify-between min-h-[280px]">
+                
+                <!-- SECTION A: RECORDING STAGE (Step 1 & 2) -->
+                <div id="sectionRecording" class="flex flex-col items-center justify-center text-center py-2 h-full">
+                    
+                    <div id="recStatusBanner" class="bg-brand-yellow text-brand-darkblue font-fredoka font-extrabold text-base sm:text-lg px-4 py-1.5 rounded-2xl shadow-sm border border-yellow-400 mb-2 flex items-center gap-2">
+                        <span id="recStatusTitle">YOUR TURN TO SPEAK! 🎤</span>
+                    </div>
+
+                    <p id="recInstructions" class="text-xs text-gray-600 max-w-md mb-3 font-semibold">
+                        Press <span class="text-brand-pink font-bold">START SPEAKING</span> to record pupil's real voice:
+                        <br><span class="text-brand-blue font-bold">"Because they're [adjective 1] and [adjective 2]."</span>
+                    </p>
+
+                    <!-- RECORDING VISUALIZER & TIMER -->
+                    <div id="recVisualizerContainer" class="hidden mb-3 flex flex-col items-center gap-1">
+                        <div class="flex items-center gap-1">
+                            <div class="rec-wave-bar"></div>
+                            <div class="rec-wave-bar"></div>
+                            <div class="rec-wave-bar"></div>
+                            <div class="rec-wave-bar"></div>
+                            <div class="rec-wave-bar"></div>
+                        </div>
+                        <span id="recordingTimer" class="font-fredoka text-red-500 font-extrabold text-base">00:00</span>
+                    </div>
+
+                    <!-- BIG RECORDING BUTTONS -->
+                    <div class="flex items-center justify-center gap-3 mb-2 flex-wrap">
+                        
+                        <!-- Start Recording Button -->
+                        <button id="btnStartRecording" onclick="startVoiceRecording()" class="bg-gradient-to-r from-brand-pink to-rose-600 hover:from-rose-600 hover:to-brand-pink text-white font-fredoka font-extrabold text-sm sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                            <i class="fa-solid fa-circle text-white text-xs animate-ping"></i>
+                            <span>START SPEAKING</span>
+                        </button>
+
+                        <!-- Stop Recording Button -->
+                        <button id="btnStopRecording" onclick="stopVoiceRecording()" class="hidden bg-gradient-to-r from-red-600 to-rose-700 text-white font-fredoka font-extrabold text-sm sm:text-base px-6 py-3 rounded-2xl shadow-lg transition-all animate-recording-pulse flex items-center gap-2">
+                            <i class="fa-solid fa-square"></i>
+                            <span>STOP SPEAKING</span>
+                        </button>
+
+                        <!-- Try Again Button -->
+                        <button id="btnTryAgainRec" onclick="resetRecordingStage()" class="hidden bg-gray-200 hover:bg-gray-300 text-brand-darkblue font-fredoka font-bold text-xs px-3 py-2 rounded-xl transition-all">
+                            <i class="fa-solid fa-rotate-right"></i> Try Again
+                        </button>
+                    </div>
+
+                    <!-- Manual Skip Option for Teacher -->
+                    <button onclick="skipToManualTeacherMode()" class="text-xs text-gray-400 hover:text-brand-blue underline mt-1">
+                        Teacher Mode (No Microphone)
+                    </button>
+                </div>
+
+
+                <!-- SECTION B: VOICE REPLAY & SPEECH RECOGNITION TRANSCRIPT (Step 3 & 4) -->
+                <div id="sectionReplayEval" class="hidden flex-col justify-between h-full">
+                    
+                    <!-- REPLAY PUPIL RECORDED VOICE BANNER -->
+                    <div class="bg-gradient-to-r from-purple-100 to-indigo-100 border-2 border-brand-purple rounded-2xl p-2.5 text-center mb-2 shadow-sm">
+                        <span class="font-fredoka text-sm sm:text-base font-extrabold text-brand-purple flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-headphones text-lg"></i> LET'S LISTEN TO YOUR ANSWER!
+                        </span>
+                        
+                        <!-- Voice Replay Controls -->
+                        <div class="mt-2 flex items-center justify-center gap-2 flex-wrap">
+                            <button id="btnReplayVoice" onclick="playPupilRecordedVoice()" class="bg-brand-purple hover:bg-purple-800 text-white font-fredoka font-extrabold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>🔊 REPLAY MY VOICE</span>
+                            </button>
+
+                            <button id="btnReRecord" onclick="resetRecordingStage()" class="bg-white border border-brand-purple text-brand-purple hover:bg-purple-50 font-bold text-xs px-3 py-1.5 rounded-xl transition-all">
+                                <i class="fa-solid fa-microphone text-xs"></i> Re-record
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TRANSCRIPTION DISPLAY & TEACHER EDIT BOX -->
+                    <div class="bg-white border-2 border-brand-blue/30 rounded-2xl p-2.5 shadow-sm mb-2">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-blue flex items-center gap-1">
+                                <i class="fa-solid fa-quote-left"></i> YOU SAID (TRANSCRIPT):
+                            </span>
+                            <span id="transcribeStatusTag" class="text-[10px] font-bold text-gray-400">Speech-to-Text</span>
+                        </div>
+
+                        <!-- Editable Transcript Input -->
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="transcriptInputField" class="flex-1 bg-slate-50 border border-gray-300 rounded-xl px-3 py-1.5 font-fredoka text-sm text-brand-darkblue font-semibold focus:outline-none focus:border-brand-blue" placeholder="Pupil's transcribed answer will appear here...">
+                            
+                            <button onclick="evaluateTranscriptAnswer()" class="bg-brand-green hover:bg-emerald-600 text-white font-fredoka font-bold text-xs px-3 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-robot"></i>
+                                <span>CHECK ANSWER</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TEACHER OVERRIDE EVALUATION BUTTONS -->
+                    <div class="bg-gray-100 p-2 rounded-xl border border-gray-200">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Teacher Manual Feedback Override:</span>
+                        <div class="grid grid-cols-4 gap-1">
+                            <button onclick="triggerManualFeedback(1)" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[10px] font-bold py-1 px-1 rounded-lg border border-emerald-300">
+                                🌟 Excellent
+                            </button>
+                            <button onclick="triggerManualFeedback(2)" class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-[10px] font-bold py-1 px-1 rounded-lg border border-blue-300">
+                                👏 Very Good
+                            </button>
+                            <button onclick="triggerManualFeedback(3)" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold py-1 px-1 rounded-lg border border-amber-300">
+                                👍 Good Try
+                            </button>
+                            <button onclick="triggerManualFeedback(5)" class="bg-rose-100 hover:bg-rose-200 text-rose-800 text-[10px] font-bold py-1 px-1 rounded-lg border border-rose-300">
+                                🔄 Try Again
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- SECTION C: AI VERBAL FEEDBACK & MODEL ANSWER REVEAL (Step 5, 6 & 7) -->
+                <div id="sectionFeedbackModel" class="hidden flex-col justify-between h-full">
+                    
+                    <!-- DYNAMIC AI FEEDBACK BANNER -->
+                    <div id="feedbackBanner" class="bg-gradient-to-r from-yellow-100 to-amber-100 border-2 border-brand-yellow rounded-2xl p-2.5 text-center mb-2 shadow-sm animate-float">
+                        <span id="feedbackLevelBadge" class="inline-block bg-brand-yellow text-brand-darkblue text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase mb-0.5">LEVEL 1 - EXCELLENT</span>
+                        <h3 id="feedbackTitleText" class="font-fredoka text-lg sm:text-xl font-extrabold text-amber-900 leading-tight">
+                            "Excellent! Very good speaking!"
+                        </h3>
+                    </div>
+
+                    <!-- MODEL ANSWER BOX -->
+                    <div class="bg-white border-2 border-brand-green rounded-2xl p-3 shadow-md mb-2 text-center">
+                        <span class="text-[11px] font-bold text-brand-green uppercase tracking-wider block mb-0.5">
+                            <i class="fa-solid fa-circle-check"></i> MODEL ANSWER
+                        </span>
+                        
+                        <p id="modelAnswerText" class="font-fredoka text-lg sm:text-2xl text-brand-darkblue font-extrabold leading-snug">
+                            "Because they're cute and funny."
+                        </p>
+
+                        <div class="mt-2 flex items-center justify-center gap-2">
+                            <button id="btnReadModelAnswer" onclick="playModelAnswerAudio()" class="bg-brand-green/20 hover:bg-brand-green hover:text-white text-brand-darkblue text-xs font-bold px-3 py-1 rounded-xl transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <span>Listen to Model Answer</span>
+                            </button>
+                            <button onclick="awardStarToClass()" class="bg-brand-yellow hover:bg-yellow-400 text-brand-darkblue text-xs font-bold px-3 py-1 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-star text-yellow-600"></i>
+                                <span>+1 Star</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 8: NEXT PUPIL / NEXT QUESTION BUTTON -->
+                    <div class="flex items-center justify-between gap-2 mt-1">
+                        <button onclick="resetCurrentRoundToReplay()" class="text-xs font-bold text-gray-500 hover:text-brand-purple">
+                            <i class="fa-solid fa-rotate-left"></i> Replay Round
+                        </button>
+
+                        <button id="btnNextPupil" onclick="goToNextPupilQuestion()" class="bg-gradient-to-r from-brand-pink to-rose-600 hover:from-rose-600 hover:to-brand-pink text-white font-fredoka font-extrabold text-sm sm:text-base px-6 py-2.5 rounded-2xl shadow-xl transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                            <span>NEXT PUPIL</span>
+                            <i class="fa-solid fa-circle-arrow-right text-lg"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER INFO & PRIVACY BRIEF -->
+    <footer class="w-full max-w-7xl mx-auto bg-white/80 backdrop-blur-sm rounded-xl p-2 sm:p-2.5 text-center text-xs text-brand-darkblue font-bold flex flex-wrap justify-between items-center gap-2 shadow-sm">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-graduation-cap text-brand-blue text-sm"></i>
+            <span>Malaysian Primary School English (Year 3/4) • "My Classmates, My AI Speaking Buddies!"</span>
+        </div>
+        <div class="text-gray-500 font-normal text-[11px]">
+            <span>🔒 Privacy Assured: Audio processed in temporary browser memory only.</span>
+        </div>
+    </footer>
+
+    <!-- MODAL: VOCABULARY BANK (18 Textbook Adjectives) -->
+    <div id="vocabModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl border-4 border-brand-purple overflow-hidden">
+            
+            <div class="bg-brand-purple p-4 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-book-open-reader text-2xl text-brand-yellow"></i>
+                    <h3 class="font-fredoka text-xl sm:text-2xl font-extrabold">Textbook Target Adjectives Bank</h3>
+                </div>
+                <button onclick="closeVocabModal()" class="text-white/80 hover:text-white text-2xl font-bold p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 bg-slate-50">
+                <div id="vocabGrid" class="contents"></div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-gray-200 text-center text-xs text-gray-500 font-semibold">
+                Click any adjective card to hear British English pronunciation!
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PRIVACY INFORMATION -->
+    <div id="privacyModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border-4 border-brand-blue relative">
+            <div class="flex items-center gap-3 mb-3 text-brand-blue">
+                <i class="fa-solid fa-shield-halved text-3xl"></i>
+                <h3 class="font-fredoka text-2xl font-extrabold">Audio Recording Privacy</h3>
+            </div>
+            
+            <ul class="space-y-2 text-xs text-gray-600 font-medium mb-4 list-disc pl-5">
+                <li>Microphone audio is captured temporarily using standard browser memory (MediaRecorder Blobs).</li>
+                <li>Audio recordings are NEVER uploaded to cloud servers or stored permanently.</li>
+                <li>Recordings are automatically cleared when moving to the next pupil or resetting the activity.</li>
+                <li>Speech recognition uses standard browser speech capabilities (`en-GB`).</li>
+            </ul>
+
+            <button onclick="closePrivacyModal()" class="w-full bg-brand-blue text-white font-fredoka font-bold py-2.5 rounded-xl">
+                Got it, Thanks!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: FINAL CELEBRATION CERTIFICATE SUMMARY -->
+    <div id="completionModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl p-6 sm:p-8 text-center shadow-2xl border-4 border-brand-yellow relative overflow-hidden">
+            
+            <div class="text-yellow-500 text-5xl mb-3 animate-bounce">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <h2 class="font-fredoka text-3xl sm:text-4xl font-extrabold text-brand-darkblue mb-2">
+                FANTASTIC SPEAKING CLASS!
+            </h2>
+            
+            <p class="text-sm sm:text-base text-gray-600 font-medium mb-6">
+                All 10 classmates have practiced speaking about animals using adjectives!
+            </p>
+
+            <div class="bg-brand-yellow/20 border-2 border-brand-yellow rounded-2xl p-4 mb-6 flex items-center justify-around">
+                <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase">Total Rounds</span>
+                    <span class="font-fredoka text-2xl font-bold text-brand-darkblue">10 / 10</span>
+                </div>
+                <div class="h-10 w-0.5 bg-brand-yellow"></div>
+                <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase">Stars Earned</span>
+                    <span id="finalStarCount" class="font-fredoka text-2xl font-bold text-yellow-600">0 ⭐</span>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4">
+                <button onclick="restartActivity()" class="bg-brand-green hover:bg-emerald-600 text-white font-fredoka font-extrabold text-base px-6 py-3 rounded-2xl shadow-lg transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Play Again</span>
+                </button>
+                <button onclick="closeCompletionModal()" class="bg-gray-200 hover:bg-gray-300 text-brand-darkblue font-fredoka font-bold text-base px-6 py-3 rounded-2xl transition-all">
+                    <span>Review Activity</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. DATA STRUCTURES & CONFIGURATION
+           ========================================================================== */
+
+        // 10 Interactive Speaking Rounds matching specified requirements
+        const SPEAKING_ROUNDS = [
+            {
+                round: 1,
+                pupilName: "Adam",
+                pupilPhoto: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=600",
+                animal: "Kittens",
+                emoji: "🐱",
+                image: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like kittens?",
+                modelAnswer: "Because they're cute and funny.",
+                targetAdjectives: ["cute", "funny", "small", "pretty"]
+            },
+            {
+                round: 2,
+                pupilName: "Siti",
+                pupilPhoto: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=600",
+                animal: "Rabbits",
+                emoji: "🐰",
+                image: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like rabbits?",
+                modelAnswer: "Because they're cute and fast.",
+                targetAdjectives: ["cute", "fast", "small", "pretty"]
+            },
+            {
+                round: 3,
+                pupilName: "Muthu",
+                pupilPhoto: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=600",
+                animal: "Dolphins",
+                emoji: "🐬",
+                image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like dolphins?",
+                modelAnswer: "Because they're intelligent and fast.",
+                targetAdjectives: ["intelligent", "fast", "pretty", "strong", "friendly"]
+            },
+            {
+                round: 4,
+                pupilName: "Mei Ling",
+                pupilPhoto: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=600",
+                animal: "Elephants",
+                emoji: "🐘",
+                image: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like elephants?",
+                modelAnswer: "Because they're big and strong.",
+                targetAdjectives: ["big", "strong", "heavy", "tall"]
+            },
+            {
+                round: 5,
+                pupilName: "Ahmad",
+                pupilPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600",
+                animal: "Giraffes",
+                emoji: "🦒",
+                image: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like giraffes?",
+                modelAnswer: "Because they're tall and interesting.",
+                targetAdjectives: ["tall", "interesting", "pretty", "big"]
+            },
+            {
+                round: 6,
+                pupilName: "Nurul",
+                pupilPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600",
+                animal: "Pandas",
+                emoji: "🐼",
+                image: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef9?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like pandas?",
+                modelAnswer: "Because they're cute and interesting.",
+                targetAdjectives: ["cute", "interesting", "big", "funny"]
+            },
+            {
+                round: 7,
+                pupilName: "Chong",
+                pupilPhoto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=600",
+                animal: "Chicks",
+                emoji: "🐥",
+                image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like chicks?",
+                modelAnswer: "Because they're small and cute.",
+                targetAdjectives: ["small", "cute", "noisy", "pretty"]
+            },
+            {
+                round: 8,
+                pupilName: "Devi",
+                pupilPhoto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=600",
+                animal: "Chimpanzees",
+                emoji: "🐒",
+                image: "https://images.unsplash.com/photo-1540573133985-758581223a36?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like chimpanzees?",
+                modelAnswer: "Because they're intelligent and funny.",
+                targetAdjectives: ["intelligent", "funny", "noisy", "strong"]
+            },
+            {
+                round: 9,
+                pupilName: "Rayyan",
+                pupilPhoto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=600",
+                animal: "Lion Cubs",
+                emoji: "🦁",
+                image: "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like lion cubs?",
+                modelAnswer: "Because they're cute and funny.",
+                targetAdjectives: ["cute", "funny", "strong", "scary"]
+            },
+            {
+                round: 10,
+                pupilName: "Anis",
+                pupilPhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600",
+                animal: "Camels",
+                emoji: "🐪",
+                image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&q=80&w=600",
+                question: "Why do you like camels?",
+                modelAnswer: "Because they're strong and interesting.",
+                targetAdjectives: ["strong", "interesting", "tall", "heavy"]
+            }
+        ];
+
+        // 18 Target Adjectives from Textbook Page 86
+        const TEXTBOOK_ADJECTIVES = [
+            { word: "pretty", emoji: "✨", example: "Kittens are pretty." },
+            { word: "cute", emoji: "🥺", example: "Rabbits are cute." },
+            { word: "big", emoji: "🐘", example: "Elephants are big." },
+            { word: "small", emoji: "🐣", example: "Chicks are small." },
+            { word: "scary", emoji: "👻", example: "Sharks are scary." },
+            { word: "thin", emoji: "✏️", example: "Snakes can be thin." },
+            { word: "tall", emoji: "🦒", example: "Giraffes are tall." },
+            { word: "long", emoji: "🐍", example: "Pythons are long." },
+            { word: "short", emoji: "🦔", example: "Hedgehogs are short." },
+            { word: "heavy", emoji: "🦏", example: "Rhinos are heavy." },
+            { word: "intelligent", emoji: "🧠", example: "Dolphins are intelligent." },
+            { word: "dangerous", emoji: "🐊", example: "Crocodiles are dangerous." },
+            { word: "interesting", emoji: "🔍", example: "Camels are interesting." },
+            { word: "boring", emoji: "😴", example: "Sleeping is boring." },
+            { word: "strong", emoji: "💪", example: "Gorillas are strong." },
+            { word: "fast", emoji: "🐆", example: "Cheetahs are fast." },
+            { word: "funny", emoji: "🤡", example: "Monkeys are funny." },
+            { word: "noisy", emoji: "📣", example: "Parrots are noisy." }
+        ];
+
+        const ALL_VALID_ADJECTIVES = [
+            "pretty", "cute", "big", "small", "scary", "thin", "tall", "long", 
+            "short", "heavy", "intelligent", "dangerous", "interesting", "boring", 
+            "strong", "fast", "funny", "noisy", "friendly", "smart", "soft", "playful"
+        ];
+
+        /* ==========================================================================
+           2. GLOBAL STATE MANAGERS & AUDIO QUEUE
+           ========================================================================== */
+        const appState = {
+            currentRoundIndex: 0,
+            currentStep: 1, // 1: Ask, 2: Record, 3: Replay & Eval, 4: Feedback & Model
+            stars: 0,
+            isMuted: false,
+            voiceSpeed: 1.0,
+            isSpeakingTTS: false,
+            
+            // MediaRecorder state
+            mediaRecorder: null,
+            audioChunks: [],
+            recordedAudioBlob: null,
+            recordedAudioUrl: null,
+            recordedAudioElement: null,
+            isRecording: false,
+            recordingTimerInterval: null,
+            recordingSeconds: 0,
+
+            // SpeechRecognition state
+            speechRecognition: null,
+            transcribedText: "",
+            
+            // Audio Queue System
+            audioQueue: []
+        };
+
+        /* ==========================================================================
+           3. WEB AUDIO SYNTHESIZER & SOUND EFFECTS
+           ========================================================================== */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSoundTone(freq, type = 'sine', duration = 0.15) {
+            if (appState.isMuted) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+
+        function playSuccessChime() {
+            if (appState.isMuted) return;
+            setTimeout(() => playSoundTone(523.25, 'triangle', 0.15), 0);
+            setTimeout(() => playSoundTone(659.25, 'triangle', 0.15), 100);
+            setTimeout(() => playSoundTone(783.99, 'triangle', 0.15), 200);
+            setTimeout(() => playSoundTone(1046.50, 'triangle', 0.3), 300);
+        }
+
+        function playStarSound() {
+            playSoundTone(880, 'sine', 0.1);
+            setTimeout(() => playSoundTone(1318.51, 'sine', 0.25), 80);
+        }
+
+        /* ==========================================================================
+           4. BRITISH SPEECH SYNTHESIS ENGINE (TTS)
+           ========================================================================== */
+        let availableVoices = [];
+
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function getBritishVoice() {
+            if (!availableVoices.length && 'speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+            const ukVoice = availableVoices.find(v => 
+                v.lang.includes('en-GB') || v.lang.includes('en_GB') || v.name.includes('UK') || v.name.includes('British')
+            );
+            if (ukVoice) return ukVoice;
+            return availableVoices.find(v => v.lang.startsWith('en')) || null;
+        }
+
+        // Stop any currently playing audio (Recorded audio or TTS)
+        function stopAllAudioPlayback() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            if (appState.recordedAudioElement) {
+                appState.recordedAudioElement.pause();
+                appState.recordedAudioElement.currentTime = 0;
+            }
+            updateSpeakingUI(false);
+        }
+
+        function speakText(text, onCompleteCallback) {
+            stopAllAudioPlayback();
+
+            if (appState.isMuted || !('speechSynthesis' in window)) {
+                if (onCompleteCallback) onCompleteCallback();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voice = getBritishVoice();
+            if (voice) utterance.voice = voice;
+
+            utterance.rate = appState.voiceSpeed;
+            utterance.pitch = 1.05;
+
+            utterance.onstart = () => {
+                appState.isSpeakingTTS = true;
+                updateSpeakingUI(true);
+            };
+
+            utterance.onend = () => {
+                appState.isSpeakingTTS = false;
+                updateSpeakingUI(false);
+                if (onCompleteCallback) onCompleteCallback();
+            };
+
+            utterance.onerror = () => {
+                appState.isSpeakingTTS = false;
+                updateSpeakingUI(false);
+                if (onCompleteCallback) onCompleteCallback();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function updateSpeakingUI(isSpeaking) {
+            const visualizer = document.getElementById('audioWaveVisualizer');
+            const speakingBadge = document.getElementById('speakingBadge');
+            const lipsOverlay = document.getElementById('speakingLipsOverlay');
+            const buddyFrame = document.getElementById('buddyFrame');
+
+            if (isSpeaking) {
+                visualizer.classList.remove('hidden');
+                speakingBadge.classList.remove('hidden');
+                lipsOverlay.classList.remove('hidden');
+                buddyFrame.classList.add('animate-pulse-glow');
+            } else {
+                visualizer.classList.add('hidden');
+                speakingBadge.classList.add('hidden');
+                lipsOverlay.classList.add('hidden');
+                buddyFrame.classList.remove('animate-pulse-glow');
+            }
+        }
+
+        /* ==========================================================================
+           5. MEDIA RECORDER API (Real Microphone Recording)
+           ========================================================================== */
+        async function startVoiceRecording() {
+            stopAllAudioPlayback();
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Microphone access is not supported in this browser. Switching to Teacher Manual Mode.");
+                skipToManualTeacherMode();
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                appState.audioChunks = [];
+                
+                appState.mediaRecorder = new MediaRecorder(stream);
+
+                appState.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        appState.audioChunks.push(event.data);
+                    }
+                };
+
+                appState.mediaRecorder.onstop = () => {
+                    // Create Audio Blob in memory
+                    appState.recordedAudioBlob = new Blob(appState.audioChunks, { type: 'audio/webm' });
+                    if (appState.recordedAudioUrl) {
+                        URL.revokeObjectURL(appState.recordedAudioUrl);
+                    }
+                    appState.recordedAudioUrl = URL.createObjectURL(appState.recordedAudioBlob);
+                    appState.recordedAudioElement = new Audio(appState.recordedAudioUrl);
+
+                    // Stop microphone track to release hardware
+                    stream.getTracks().forEach(track => track.stop());
+
+                    // Transition to Step 3: Replay & Speech Recognition
+                    processRecordedAudio();
+                };
+
+                appState.mediaRecorder.start();
+                appState.isRecording = true;
+
+                // Start SpeechRecognition simultaneously
+                startSpeechRecognitionTask();
+
+                // UI Updates for Recording State
+                document.getElementById('btnStartRecording').classList.add('hidden');
+                document.getElementById('btnStopRecording').classList.remove('hidden');
+                document.getElementById('recVisualizerContainer').classList.remove('hidden');
+                document.getElementById('recStatusTitle').innerText = "LISTENING... SPEAK NOW! 🎙️";
+                document.getElementById('recStatusBanner').className = "bg-brand-pink text-white font-fredoka font-extrabold text-base sm:text-lg px-4 py-1.5 rounded-2xl shadow-sm animate-pulse mb-2";
+
+                // Start Recording Timer
+                appState.recordingSeconds = 0;
+                document.getElementById('recordingTimer').innerText = "00:00";
+                appState.recordingTimerInterval = setInterval(() => {
+                    appState.recordingSeconds++;
+                    const secs = appState.recordingSeconds < 10 ? '0' + appState.recordingSeconds : appState.recordingSeconds;
+                    document.getElementById('recordingTimer').innerText = `00:${secs}`;
+                }, 1000);
+
+            } catch (err) {
+                console.error("Microphone permission denied or error:", err);
+                alert("Microphone access permission was denied or unavailable. You can use Teacher Mode to evaluate answers manually!");
+                skipToManualTeacherMode();
+            }
+        }
+
+        function stopVoiceRecording() {
+            if (appState.mediaRecorder && appState.isRecording) {
+                appState.isRecording = false;
+                clearInterval(appState.recordingTimerInterval);
+                appState.mediaRecorder.stop();
+
+                if (appState.speechRecognition) {
+                    try { appState.speechRecognition.stop(); } catch(e){}
+                }
+
+                // Reset UI
+                document.getElementById('btnStartRecording').classList.remove('hidden');
+                document.getElementById('btnStopRecording').classList.add('hidden');
+                document.getElementById('recVisualizerContainer').classList.add('hidden');
+            }
+        }
+
+        function resetRecordingStage() {
+            stopAllAudioPlayback();
+            setStepState(2);
+            document.getElementById('transcriptInputField').value = "";
+            document.getElementById('btnStartRecording').classList.remove('hidden');
+            document.getElementById('btnStopRecording').classList.add('hidden');
+            document.getElementById('recVisualizerContainer').classList.add('hidden');
+            document.getElementById('recStatusTitle').innerText = "YOUR TURN TO SPEAK! 🎤";
+            document.getElementById('recStatusBanner').className = "bg-brand-yellow text-brand-darkblue font-fredoka font-extrabold text-base sm:text-lg px-4 py-1.5 rounded-2xl shadow-sm border border-yellow-400 mb-2";
+        }
+
+        /* ==========================================================================
+           6. SPEECH RECOGNITION (Web Speech API)
+           ========================================================================== */
+        function startSpeechRecognitionTask() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                appState.transcribedText = "";
+                return;
+            }
+
+            appState.speechRecognition = new SpeechRecognition();
+            appState.speechRecognition.continuous = false;
+            appState.speechRecognition.interimResults = true;
+            appState.speechRecognition.lang = 'en-GB';
+
+            appState.speechRecognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                appState.transcribedText = transcript;
+                document.getElementById('transcriptInputField').value = transcript;
+            };
+
+            appState.speechRecognition.onerror = (err) => {
+                console.log("Speech recognition error:", err);
+            };
+
+            try {
+                appState.speechRecognition.start();
+            } catch(e) {}
+        }
+
+        /* ==========================================================================
+           7. STEP 3 & 4: AUTOMATIC REPLAY OF PUPIL VOICE & AI EVALUATION
+           ========================================================================== */
+        function processRecordedAudio() {
+            setStepState(3);
+
+            // Populate Transcript Field if available
+            if (!document.getElementById('transcriptInputField').value) {
+                document.getElementById('transcriptInputField').value = appState.transcribedText || "Because they're cute and fast.";
+            }
+
+            // AUTO REPLAY PUPIL RECORDED VOICE ONCE
+            setTimeout(() => {
+                playPupilRecordedVoice(() => {
+                    // Automatically trigger AI evaluation once pupil replay finishes!
+                    evaluateTranscriptAnswer();
+                });
+            }, 500);
+        }
+
+        function playPupilRecordedVoice(onEndedCallback) {
+            stopAllAudioPlayback();
+
+            if (!appState.recordedAudioElement) {
+                if (onEndedCallback) onEndedCallback();
+                return;
+            }
+
+            appState.recordedAudioElement.currentTime = 0;
+            
+            appState.recordedAudioElement.onended = () => {
+                if (onEndedCallback) onEndedCallback();
+            };
+
+            appState.recordedAudioElement.onerror = () => {
+                if (onEndedCallback) onEndedCallback();
+            };
+
+            appState.recordedAudioElement.play().catch(e => {
+                console.log("Autoplay restriction prevented audio replay:", e);
+                if (onEndedCallback) onEndedCallback();
+            });
+        }
+
+        /* ==========================================================================
+           8. INTELLIGENT MULTI-LEVEL ANSWER EVALUATION
+           ========================================================================== */
+        function evaluateTranscriptAnswer() {
+            const rawText = document.getElementById('transcriptInputField').value.toLowerCase().trim();
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+
+            let matchedAdjectives = [];
+            ALL_VALID_ADJECTIVES.forEach(adj => {
+                if (rawText.includes(adj)) {
+                    if (!matchedAdjectives.includes(adj)) matchedAdjectives.push(adj);
+                }
+            });
+
+            let feedbackLevel = 1;
+
+            if (rawText.length === 0) {
+                feedbackLevel = 5; // Unclear audio / empty
+            } else if (matchedAdjectives.length >= 2) {
+                feedbackLevel = 1; // Level 1: Excellent
+            } else if (matchedAdjectives.length === 1) {
+                feedbackLevel = 2; // Level 2: Very Good
+            } else if (rawText.includes("because") || rawText.includes("like") || rawText.includes("they")) {
+                feedbackLevel = 3; // Level 3: Good Try (sentence structure without clear target adjectives)
+            } else {
+                feedbackLevel = 4; // Level 4: Irrelevant / Incorrect
+            }
+
+            triggerFeedbackDisplayAndAudio(feedbackLevel);
+        }
+
+        function triggerManualFeedback(levelNum) {
+            triggerFeedbackDisplayAndAudio(levelNum);
+        }
+
+        function triggerFeedbackDisplayAndAudio(levelNum) {
+            setStepState(4);
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+
+            const banner = document.getElementById('feedbackBanner');
+            const levelBadge = document.getElementById('feedbackLevelBadge');
+            const titleText = document.getElementById('feedbackTitleText');
+
+            let spokenFeedback = "";
+
+            if (levelNum === 1) {
+                levelBadge.innerText = "LEVEL 1 - EXCELLENT!";
+                levelBadge.className = "inline-block bg-brand-green text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1";
+                titleText.innerText = "🌟 Excellent! Very good speaking!";
+                banner.className = "bg-gradient-to-r from-emerald-100 to-teal-100 border-2 border-brand-green rounded-2xl p-2.5 text-center mb-2 shadow-sm animate-float";
+                spokenFeedback = "Excellent! Very good speaking!";
+                playSuccessChime();
+                awardStarToClass();
+            } else if (levelNum === 2) {
+                levelBadge.innerText = "LEVEL 2 - VERY GOOD!";
+                levelBadge.className = "inline-block bg-brand-blue text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1";
+                titleText.innerText = "👏 Very good! Can you add one more describing word?";
+                banner.className = "bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-brand-blue rounded-2xl p-2.5 text-center mb-2 shadow-sm animate-float";
+                spokenFeedback = "Very good! Can you add one more describing word?";
+                playSuccessChime();
+            } else if (levelNum === 3) {
+                levelBadge.innerText = "LEVEL 3 - GOOD TRY!";
+                levelBadge.className = "inline-block bg-brand-yellow text-brand-darkblue text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1";
+                titleText.innerText = "👍 Good try! Let's say it together.";
+                banner.className = "bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-brand-yellow rounded-2xl p-2.5 text-center mb-2 shadow-sm animate-float";
+                spokenFeedback = "Good try! Let me help you with the model answer.";
+            } else if (levelNum === 4) {
+                levelBadge.innerText = "LEVEL 4 - NICE TRY!";
+                levelBadge.className = "inline-block bg-brand-pink text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1";
+                titleText.innerText = "Nice try! Let me show you a great model answer.";
+                banner.className = "bg-gradient-to-r from-rose-100 to-pink-100 border-2 border-brand-pink rounded-2xl p-2.5 text-center mb-2 shadow-sm animate-float";
+                spokenFeedback = "Nice try! Let's learn the correct model answer together.";
+            } else {
+                levelBadge.innerText = "LEVEL 5 - UNCLEAR AUDIO";
+                levelBadge.className = "inline-block bg-gray-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1";
+                titleText.innerText = "I couldn't hear clearly. Let's try again or view the model answer!";
+                banner.className = "bg-gradient-to-r from-gray-100 to-slate-200 border-2 border-gray-400 rounded-2xl p-2.5 text-center mb-2 shadow-sm";
+                spokenFeedback = "I couldn't hear you clearly. Let's try again!";
+            }
+
+            // Speak Feedback TTS, then automatically speak model answer!
+            speakText(spokenFeedback, () => {
+                setTimeout(() => {
+                    playModelAnswerAudio();
+                }, 400);
+            });
+        }
+
+        function playModelAnswerAudio() {
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+            speakText(currentRound.modelAnswer);
+        }
+
+        /* ==========================================================================
+           9. STEP WORKFLOW MANAGEMENT & UI CONTROL
+           ========================================================================== */
+        function loadRound(index) {
+            appState.currentRoundIndex = index;
+            const currentRound = SPEAKING_ROUNDS[index];
+
+            // Clean up old audio URLs to protect browser memory
+            if (appState.recordedAudioUrl) {
+                URL.revokeObjectURL(appState.recordedAudioUrl);
+                appState.recordedAudioUrl = null;
+                appState.recordedAudioBlob = null;
+                appState.recordedAudioElement = null;
+            }
+
+            // Update Header & Pupil Metadata
+            document.getElementById('currentRoundText').innerText = currentRound.round;
+            document.getElementById('pupilNameDisplay').innerText = `Classmate: ${currentRound.pupilName}`;
+            document.getElementById('buddyIdentityLabel').innerText = `SPEAKING BUDDY #${currentRound.round}`;
+            document.getElementById('pupilPhoto').src = currentRound.pupilPhoto;
+
+            // Update Left Question Speech Bubble
+            document.getElementById('questionText').innerText = `"${currentRound.question}"`;
+
+            // Update Target Animal Details
+            document.getElementById('animalTitle').innerText = currentRound.animal;
+            document.getElementById('animalImg').src = currentRound.image;
+            document.getElementById('animalEmoji').innerText = currentRound.emoji;
+            document.getElementById('animalNameTag').innerText = `Round ${currentRound.round} Target`;
+
+            // Render Adjectives Badges
+            const badgesContainer = document.getElementById('suggestedAdjectivesBadges');
+            badgesContainer.innerHTML = currentRound.targetAdjectives.map(adj => 
+                `<span class="bg-white border border-brand-green text-brand-darkblue text-[11px] font-bold px-2 py-0.5 rounded-xl shadow-sm cursor-pointer hover:bg-brand-green hover:text-white transition-all" onclick="speakAdjective('${adj}')">${adj}</span>`
+            ).join('');
+
+            // Set Model Answer text
+            document.getElementById('modelAnswerText').innerText = `"${currentRound.modelAnswer}"`;
+
+            // Reset UI View to Step 1 (Ask)
+            setStepState(1);
+
+            // Play Question Audio on start of round
+            setTimeout(() => {
+                playCurrentQuestionAudio();
+            }, 300);
+        }
+
+        function setStepState(stepNum) {
+            appState.currentStep = stepNum;
+
+            const tab1 = document.getElementById('stepTab1');
+            const tab2 = document.getElementById('stepTab2');
+            const tab3 = document.getElementById('stepTab3');
+            const tab4 = document.getElementById('stepTab4');
+
+            const sectionRecording = document.getElementById('sectionRecording');
+            const sectionReplayEval = document.getElementById('sectionReplayEval');
+            const sectionFeedbackModel = document.getElementById('sectionFeedbackModel');
+
+            [tab1, tab2, tab3, tab4].forEach(tab => {
+                tab.className = "py-1.5 px-1 rounded-xl transition-all text-gray-500 font-bold text-[11px] sm:text-xs";
+            });
+
+            if (stepNum === 1 || stepNum === 2) {
+                tab1.className = "py-1.5 px-1 rounded-xl transition-all bg-brand-blue text-white shadow-md font-bold text-[11px] sm:text-xs";
+                tab2.className = "py-1.5 px-1 rounded-xl transition-all bg-brand-yellow text-brand-darkblue font-bold text-[11px] sm:text-xs";
+                sectionRecording.classList.remove('hidden');
+                sectionRecording.classList.add('flex');
+                sectionReplayEval.classList.add('hidden');
+                sectionReplayEval.classList.remove('flex');
+                sectionFeedbackModel.classList.add('hidden');
+                sectionFeedbackModel.classList.remove('flex');
+            } else if (stepNum === 3) {
+                tab3.className = "py-1.5 px-1 rounded-xl transition-all bg-brand-purple text-white shadow-md font-bold text-[11px] sm:text-xs";
+                sectionRecording.classList.add('hidden');
+                sectionRecording.classList.remove('flex');
+                sectionReplayEval.classList.remove('hidden');
+                sectionReplayEval.classList.add('flex');
+                sectionFeedbackModel.classList.add('hidden');
+                sectionFeedbackModel.classList.remove('flex');
+            } else if (stepNum === 4) {
+                tab4.className = "py-1.5 px-1 rounded-xl transition-all bg-brand-green text-white shadow-md font-bold text-[11px] sm:text-xs";
+                sectionRecording.classList.add('hidden');
+                sectionRecording.classList.remove('flex');
+                sectionReplayEval.classList.add('hidden');
+                sectionReplayEval.classList.remove('flex');
+                sectionFeedbackModel.classList.remove('hidden');
+                sectionFeedbackModel.classList.add('flex');
+            }
+        }
+
+        function playCurrentQuestionAudio() {
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+            speakText(currentRound.question, () => {
+                setStepState(2);
+            });
+        }
+
+        function skipToManualTeacherMode() {
+            setStepState(3);
+            document.getElementById('transcriptInputField').value = "Because they're cute and funny.";
+        }
+
+        function resetCurrentRoundToReplay() {
+            setStepState(2);
+        }
+
+        function goToNextPupilQuestion() {
+            if (appState.currentRoundIndex < SPEAKING_ROUNDS.length - 1) {
+                loadRound(appState.currentRoundIndex + 1);
+            } else {
+                showCompletionScreen();
+            }
+        }
+
+        function awardStarToClass() {
+            appState.stars += 1;
+            document.getElementById('starCounter').innerText = appState.stars;
+            playStarSound();
+
+            confetti({
+                particleCount: 25,
+                spread: 50,
+                origin: { y: 0.8 }
+            });
+        }
+
+        /* ==========================================================================
+           10. PUPIL PHOTO & NAME MANAGEMENT
+           ========================================================================== */
+        function handlePupilPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('pupilPhoto').src = e.target.result;
+                    SPEAKING_ROUNDS[appState.currentRoundIndex].pupilPhoto = e.target.result;
+                    playSoundTone(600, 'sine', 0.1);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function promptEditPupilName() {
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+            const newName = prompt("Enter Classmate Pupil Name:", currentRound.pupilName);
+            if (newName && newName.trim().length > 0) {
+                currentRound.pupilName = newName.trim();
+                document.getElementById('pupilNameDisplay').innerText = `Classmate: ${currentRound.pupilName}`;
+            }
+        }
+
+        function resetCurrentPupilPhoto() {
+            const currentRound = SPEAKING_ROUNDS[appState.currentRoundIndex];
+            document.getElementById('pupilPhoto').src = currentRound.pupilPhoto;
+            document.getElementById('photoUploadInput').value = '';
+        }
+
+        /* ==========================================================================
+           11. VOCABULARY BANK & PRIVACY MODALS
+           ========================================================================== */
+        function renderVocabBankCards() {
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = TEXTBOOK_ADJECTIVES.map(adj => `
+                <div onclick="speakAdjective('${adj.word}')" class="bg-white hover:bg-brand-yellow/10 border-2 border-gray-200 hover:border-brand-purple p-3 rounded-2xl shadow-sm hover:shadow-md cursor-pointer transition-all flex flex-col items-center text-center group">
+                    <span class="text-3xl mb-1 group-hover:scale-125 transition-transform">${adj.emoji}</span>
+                    <span class="font-fredoka text-lg font-extrabold text-brand-darkblue group-hover:text-brand-purple">${adj.word}</span>
+                    <span class="text-[11px] text-gray-500 font-medium mt-1 leading-tight">"${adj.example}"</span>
+                    <span class="mt-2 text-xs font-bold text-brand-purple flex items-center gap-1">
+                        <i class="fa-solid fa-volume-high text-[10px]"></i> Listen
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function openVocabModal() {
+            document.getElementById('vocabModal').classList.remove('hidden');
+            playSoundTone(400, 'sine', 0.1);
+        }
+
+        function closeVocabModal() {
+            document.getElementById('vocabModal').classList.add('hidden');
+        }
+
+        function openPrivacyModal() {
+            document.getElementById('privacyModal').classList.remove('hidden');
+        }
+
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').classList.add('hidden');
+        }
+
+        function speakAdjective(word) {
+            playSoundTone(500, 'sine', 0.05);
+            speakText(word);
+        }
+
+        /* ==========================================================================
+           12. AUDIO SETTINGS & CONTROLS
+           ========================================================================== */
+        function toggleMute() {
+            appState.isMuted = !appState.isMuted;
+            const muteIcon = document.getElementById('muteIcon');
+            if (appState.isMuted) {
+                muteIcon.className = "fa-solid fa-volume-xmark text-lg text-red-500";
+                stopAllAudioPlayback();
+            } else {
+                muteIcon.className = "fa-solid fa-volume-high text-lg text-brand-blue";
+            }
+        }
+
+        function changeVoiceSpeed(value) {
+            appState.voiceSpeed = parseFloat(value);
+        }
+
+        /* ==========================================================================
+           13. ACTIVITY COMPLETION & RESET
+           ========================================================================== */
+        function showCompletionScreen() {
+            document.getElementById('finalStarCount').innerText = `${appState.stars} ⭐`;
+            document.getElementById('completionModal').classList.remove('hidden');
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function closeCompletionModal() {
+            document.getElementById('completionModal').classList.add('hidden');
+        }
+
+        function restartActivity() {
+            appState.stars = 0;
+            document.getElementById('starCounter').innerText = "0";
+            closeCompletionModal();
+            loadRound(0);
+        }
+
+        /* ==========================================================================
+           14. INITIALIZATION ON WINDOW LOAD
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderVocabBankCards();
+            loadRound(0);
+        });
+    </script>
+</body>
+</html>
